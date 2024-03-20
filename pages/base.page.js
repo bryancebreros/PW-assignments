@@ -1,16 +1,15 @@
-import { expect } from "@playwright/test"
 export class BasePage {
     constructor(page){
         this.page = page
-        
-        this.loginBtn = '//*[@id="__next"]/div[3]/header/div/div[3]/div[3]/a'
+        this.loginBtn = '[data-automation="loginButton"]'
         this.loginFrameId = '#login-iframe'
-        this.emailInput = '//*[@id=":r1:"]'
-        this.passInput = '//*[@id="root"]/div/main/div/div/div/div/div/form/div[2]/div[1]/span[2]/div/div/input'
-        this.createBtn = '//*[@id="root"]/div/div/main/div/div/div/div/div/form/div[2]/div[4]/span/a'
-        this.confirmBtn = '//*[@id="root"]/div/main/div/div/div/div/div/form/div[2]/div[2]/div[1]/span/button'
-        this.accountIcon = '//*[@id="__next"]/div[3]/header/div/div[3]/div[3]/button/div/svg'
-        this.logoutBtn = '/html/body/div[9]/div[3]/div/div/ul[2]/a[3]'
+        this.emailInput = '[data-test-id="email-input"]'
+        this.passInput = '[data-test-id="password-input"]'
+        this.createBtn = '[data-test-id="create-user-btn"]'
+        this.confirmBtn = '[data-test-id="create-user-form-submit-button"]'
+        this.accountIcon = '[aria-label="User profile"]'
+        this.logoutBtn = '[data-automation="ProfileDrawer_LogoutButton"]'
+        this.sendLogin = '[data-test-id="login-form-submit-button"]'
     }
     async goToMainPage(){
         await this.page.goto('https://www.shutterstock.com/')
@@ -19,29 +18,27 @@ export class BasePage {
     async createNewAccount(email, password){
         await this.page.locator(this.loginBtn).click()
         await this.page.waitForTimeout(3000)
-
         const loginFrame = await this.page.frameLocator(this.loginFrameId)
         await loginFrame.locator(this.createBtn).click()
-
         await loginFrame.locator(this.emailInput).fill(email)
+        await this.page.waitForTimeout(2000)
+
         await loginFrame.locator(this.passInput).fill(password)
+        await this.page.waitForTimeout(2500)
+
         await loginFrame.locator(this.confirmBtn).click()
+        await this.page.waitForTimeout(5000)
 
     }
     async login(email, pass){
         await this.page.locator(this.loginBtn).click()
-        await this.page.locator('//*[@id=":r0:"]').fill(email)
-        await this.page.locator('//*[@id="root"]/div/div/main/div/div/div/div/div/form/div[2]/div[1]/span[2]/div/div/input').fill(pass)
-        await this.page.locator('//*[@id="root"]/div/div/main/div/div/div/div/div/form/div[2]/div[2]/div[1]/span/button').click()
-
-
-    }
-    async verifyLogin(email){
-        await this.page.goto('https://www.shutterstock.com/account/profile')
+        const loginFrame = await this.page.frameLocator(this.loginFrameId)
         await this.page.waitForTimeout(3000)
-        await expect(this.page.locator('//*[@id="__next"]/div[2]/div/div/div[1]/div/div/div[2]/div[2]/div[2]/table/tbody/tr[5]/td[2]')).toHaveText(email)
-
-
+        await this.loginFrame.locator(this.emailInput).fill(email)
+        await this.page.waitForTimeout(1000)
+        await this.loginFrame.locator(this.passInput).fill(pass)
+        await this.page.waitForTimeout(3000)
+        await this.loginFrame.locator(this.sendLogin).click()
     }
     async logOut(){
         await this.page.locator(this.accountIcon).click()
